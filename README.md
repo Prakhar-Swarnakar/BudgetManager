@@ -4,9 +4,10 @@ A simple personal app for managing a monthly budget. Set a budget per category a
 
 - **Platform:** native Android app, single user
 - **Data:** stored on the phone only
-- **Phase:** design is complete and open questions are settled. Phase 1 (a small test of SMS, notifications, and installing) is ready to run. The full build plan is in `14-implementation-plan.md`.
+- **Phase:** Phase 1 (SMS, notification, and install testing) run and mostly confirmed working. Building the real app: M0-M3 done (project foundation, domain core and database, SMS receive/catch-up, Messages page). M4 (Add Transaction and the real accept flow) is next. See the progress tracker in `14-implementation-plan.md`.
 - **Built with:** Kotlin and Jetpack Compose, in Android Studio
-- **Last updated:** 2026-09-24
+- **Code:** private repo at [BudgetManager-app](https://github.com/Prakhar-Swarnakar/BudgetManager-app)
+- **Last updated:** 2026-09-25
 
 ## Documents
 

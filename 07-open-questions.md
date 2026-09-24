@@ -48,7 +48,7 @@ Earlier this file listed assumptions and open questions. On 24 September 2026 yo
 | # | Question | Decision |
 |---|---|---|
 | 25 | Dependency injection | Hilt |
-| 26 | Navigation | Navigation 3 if it is stable when the project starts. Otherwise Navigation Compose |
+| 26 | Navigation | Navigation 3. Confirmed stable (went stable 2026-09-23, days before M0) and in use since M0 - bottom bar, side panel, and the Messages-to-Add-Transaction-stub push all work on it |
 | 27 | Application ID | `com.budgetmanager.app`. Chosen generic, without a personal name. Change it before the project is created, because it cannot be changed afterwards without making a new app |
 | 28 | Code repository | A private Git repository, in a folder outside OneDrive. Sample SMS never goes in a public repository |
 | 29 | Android's automatic cloud backup | Off (`allowBackup="false"`). It would copy SMS-derived data to a Google account. Your own export file (M9) is the backup |
@@ -57,11 +57,11 @@ Earlier this file listed assumptions and open questions. On 24 September 2026 yo
 
 | Item | Needed by | Who |
 |---|---|---|
-| Phase 1 test results ([11-phase-1-results.md](11-phase-1-results.md)) | Before Phase 2 starts | You |
-| 30 to 50 real bank SMS with personal details removed ([14-implementation-plan.md](14-implementation-plan.md) explains how and gives a template) | Milestone M2, the SMS parser. Milestones M0 and M1 can start without them | You |
+| Phase 1 test results, remaining rows (swiped away confirmed working; reboot, force-stop, screen-off-an-hour, second SIM still to run) ([11-phase-1-results.md](11-phase-1-results.md)) | Good to have before M2b; did not block M2a/M2c, which are already built and proven against a real SMS | You |
+| 30 to 50 real bank SMS with personal details removed ([14-implementation-plan.md](14-implementation-plan.md) explains how and gives a template) | Milestone M2b, the per-bank parser - the only part of M2 not yet built | You |
 | ~~Confirm the application ID in row 27~~ Done: `com.budgetmanager.app` | Before milestone M0 | You |
-| Whether Navigation 3 is stable | Milestone M0 | Me |
-| Whether Room 3.0 is stable (we start on Room 2.x either way) | Milestone M0 | Me |
+| ~~Whether Navigation 3 is stable~~ Done: confirmed stable, in use since M0 (row 26) | Milestone M0 | Me |
+| Whether Room 3.0 is stable | Not needed - staying on Room 2.x (2.8.5) through v1 as planned; no reason to revisit | Me |
 
 ## Pages
 

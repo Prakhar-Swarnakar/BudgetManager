@@ -45,15 +45,15 @@ One user (the owner), on their own Android phone, with accounts at several diffe
 | Trends: Previous month | Shows budget used per month over 6 months, plus this month so far against last month by category | Assumed |
 | App framework | Native Android in Kotlin with Jetpack Compose, built in Android Studio. Flutter was considered and dropped | Decided |
 | Test phone | Pixel 7a running Android 17 | Decided |
-| Architecture | MVVM with unidirectional data flow, in UI, domain, and data layers. One Gradle module organised by feature (see 12-tech-architecture.md) | Assumed |
-| Tech stack | Hilt for dependency injection, Room for the database, DataStore for settings, Navigation 3, coroutines and Flow, custom Canvas charts | Assumed |
+| Architecture | MVVM with unidirectional data flow, in UI, domain, and data layers. One Gradle module organised by feature (see 12-tech-architecture.md) | Decided - built and proven across M0 to M4 |
+| Tech stack | Hilt for dependency injection, Room for the database, DataStore for settings, Navigation 3, coroutines and Flow, custom Canvas charts | Decided, except the Canvas charts which are not built until M10 |
 | Money | Stored as whole paise in a `Long`, formatted in one place with Indian grouping | Decided |
 | Development rules | Practices in 13-development-best-practices.md apply to all code | Assumed |
-| Starter categories | Rent, Groceries, Food & Dining, Transport, Bills & Utilities, Entertainment, Shopping, Health, Other, created on first launch with ₹0 budgets | Assumed |
+| Starter categories | Rent, Groceries, Food & Dining, Transport, Bills & Utilities, Entertainment, Shopping, Health, Other, created on first launch with ₹0 budgets | Decided - seeded in M1, confirmed present on a real first launch (row 11 in 11-phase-1-results.md) |
 | Editing transactions | Done on the Category detail page, opened from a Home card. Deleting an SMS-based transaction returns the message to Not assigned | Assumed |
 | Monthly budget saving | No Save button. Each amount is saved when its sheet is saved | Assumed |
 | Open questions | All previously open questions were settled with defaults on 24 Sep 2026 (see 07-open-questions.md) | Assumed |
-| Implementation | Built in vertical milestones M0 to M12, each running on the phone (see 14-implementation-plan.md) | Assumed |
+| Implementation | Built in vertical milestones M0 to M12, each running on the phone (see 14-implementation-plan.md) | Decided - M0 to M4 done |
 | Build approach | Four phases. Phase 1 tests SMS reading, notifications, and installing on the phone before anything else is built | Decided |
 | Currency | Indian rupee (₹) | Assumed |
 | Distribution | Installed directly on the owner's phone, not through the Play Store. Android may block or add steps to this, so it is tested first (see 09-risks-and-phases.md) | Assumed |

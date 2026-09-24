@@ -62,14 +62,14 @@ A round **Add** button on Home starts a manual transaction.
 - Filter chips: All, Not assigned, Accepted, Rejected, each with a count.
 - One row per message with the merchant, date and time, and amount. New messages are in bold with a small blue dot.
 - Rows are white, green, or red by status. Accepted rows also show the category. Each status has an icon and a label, so colour is never the only signal.
-- Swiping right reveals a green Accept strip. Swiping left reveals a red Reject strip *(directions assumed)*.
+- On a Not assigned row, swiping right reveals a green Accept strip and swiping left reveals a red Reject strip. On an Accepted or Rejected row, the one live direction (back to Not assigned) reveals a neutral grey "undo" strip instead, and the other direction shows nothing - the strip always matches what the swipe will really do. Confirmed and built in M3/M4; full rules in [04-messages-and-notifications.md](04-messages-and-notifications.md#gestures).
 
 ### Add transaction
 
 - A banner with the original SMS text when opened from a message.
 - A large amount field.
 - A grid of category chips, with the suggested one highlighted and labelled "Suggested".
-- Date and note fields, and a Save button.
+- Date and note fields, and Cancel and Save buttons, built in M4.
 
 ### Trends
 

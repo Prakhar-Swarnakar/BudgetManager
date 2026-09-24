@@ -33,23 +33,24 @@ Flows marked *(assumed)* contain a step I filled in that needs your confirmation
 3. If it is, the app extracts the amount, merchant, and date, and saves it as a message with status **not assigned**.
 4. The Messages page icon shows a small red circle.
 5. The app shows a simple notification, for example "3 new spends detected".
-6. Tapping the notification opens the Messages page *(assumed)*.
+6. Tapping the notification opens the app *(assumed to land on the Messages page directly; as built in M2, it opens `MainActivity` generally and lands on Home - the Messages deep link, R20 in [09-risks-and-phases.md](09-risks-and-phases.md), is not wired up yet, see [07-open-questions.md](07-open-questions.md))*.
 
 ## 5. Review messages
 
-1. The user opens the Messages page and sees the list of received messages, newest first *(assumed)*.
+1. The user opens the Messages page and sees the list of received messages, newest first.
 2. Each row is coloured by status: white (not assigned), green (accepted), red (rejected).
-3. The user can:
-   - **Swipe right** to accept *(direction assumed)*
-   - **Swipe left** to reject *(direction assumed)*
+3. On a **Not assigned** row, the user can:
+   - **Swipe right** to accept
+   - **Swipe left** to reject
    - **Tap** the message to open it and read the full SMS
+4. On an **Accepted** or **Rejected** row, the one live swipe direction reverts it to Not assigned instead (see flows 6 and 7). Built and confirmed on-device in M4; full gesture table in [04-messages-and-notifications.md](04-messages-and-notifications.md#gestures).
 
 ## 6. Accept a message
 
 1. The user accepts a message by swiping.
 2. The Add Transaction page opens with the details pre-filled: amount, date, merchant as the note, and a suggested category if a keyword matched.
 3. The user edits anything they want and saves.
-4. The message turns green (accepted) and the transaction is added to the category *(status changes on save, assumed)*.
+4. The message turns green (accepted) and the transaction is added to the category. Both happen together in one atomic database write, confirmed in M4.
 5. If the user leaves without saving, the message stays white (not assigned).
 
 ## 7. Reject a message
@@ -58,7 +59,7 @@ Flows marked *(assumed)* contain a step I filled in that needs your confirmation
 2. The message turns red (rejected) and no transaction is created.
 3. It stays in the list so it is still visible.
 4. A short **Undo** bar appears for a few seconds after the swipe.
-5. A rejected message can still be accepted later, by swiping right or with the Accept button on its detail page.
+5. A rejected message can be swiped right to return it to Not assigned - from there it can be accepted like any other Not assigned message. It cannot go straight from Rejected to Accepted (revised 2026-09-25 during M4; see row 7 in [07-open-questions.md](07-open-questions.md)).
 
 ## 8. Budget alerts
 

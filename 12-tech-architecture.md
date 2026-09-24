@@ -2,7 +2,7 @@
 
 This document describes how the real app (Phases 2 to 4) will be built: the technology, the architecture, the folder structure, and how components are reused. The Phase 1 test app is throwaway and does not follow this structure. Coding rules are in [13-development-best-practices.md](13-development-best-practices.md).
 
-Every choice below is marked **Assumed**. They are my recommendations as architect. Please confirm or change them before Phase 2 starts.
+Every choice below started out marked **Assumed**, as my recommendations as architect. Phase 2 (M0 to M4) is now built on them, so the status column reflects what has actually been proven on-device, not just proposed.
 
 ## 1. Decisions at a glance
 
@@ -10,21 +10,21 @@ Every choice below is marked **Assumed**. They are my recommendations as archite
 |---|---|---|---|
 | Language | Kotlin | Google's primary language for Android, with the best tooling and the most current examples | Decided |
 | UI | Jetpack Compose with Material 3 | Google's recommended UI toolkit. Little boilerplate, and reusable components are ordinary functions | Decided |
-| Architecture | MVVM with unidirectional data flow, in three layers: UI, domain, data | Google's official recommendation. Keeps screens simple and logic testable | Assumed |
-| Structure | One Gradle module, organised by feature | Small single-user app. Multiple modules would add build complexity for no benefit | Assumed |
-| Navigation | Navigation 3 (the back stack is a list you control). If it proves awkward, fall back to Navigation Compose | Google's current recommendation for new Compose apps. Its stable status should be checked when Phase 2 starts | Assumed |
-| Dependency injection | Hilt | Google recommends it for apps with several screens and ViewModels. It removes hand-written wiring | Assumed |
-| Database | Room (version 2.x, with KSP) | The standard on-device database layer with compile-time checked queries and schema versioning | Assumed |
-| Settings storage | DataStore (Preferences) | Replaces SharedPreferences. Safe for asynchronous use | Assumed |
+| Architecture | MVVM with unidirectional data flow, in three layers: UI, domain, data | Google's official recommendation. Keeps screens simple and logic testable | Decided - built and proven across M0 to M4 |
+| Structure | One Gradle module, organised by feature | Small single-user app. Multiple modules would add build complexity for no benefit | Decided |
+| Navigation | Navigation 3 (the back stack is a list you control) | Went stable 2026-09-23, days before M0. In use since M0 for the bottom bar, side panel, and Messages-to-Add-Transaction navigation, with no need for the Navigation Compose fallback | Decided (row 26 in [07-open-questions.md](07-open-questions.md)) |
+| Dependency injection | Hilt | Google recommends it for apps with several screens and ViewModels. It removes hand-written wiring | Decided - with one confirmed limitation: a `BroadcastReceiver` cannot use `@AndroidEntryPoint` (see section 6 below) |
+| Database | Room (version 2.x, with KSP) | The standard on-device database layer with compile-time checked queries and schema versioning | Decided |
+| Settings storage | DataStore (Preferences) | Replaces SharedPreferences. Safe for asynchronous use | Decided - holds the SMS catch-up marker since M2c |
 | Async work | Kotlin coroutines and Flow | The standard way to pass data between layers | Decided |
-| Charts | Custom drawing with Compose Canvas, no chart library | The donut with a "used" part inside each slice is not a stock chart (R29). Bars are simple to draw | Assumed |
-| Dates | `java.time` | Available on API 26 and above, which is our minimum | Assumed |
+| Charts | Custom drawing with Compose Canvas, no chart library | The donut with a "used" part inside each slice is not a stock chart (R29). Bars are simple to draw | Assumed - not built until M10 |
+| Dates | `java.time` | Available on API 26 and above, which is our minimum | Decided |
 | Money | Whole paise stored as `Long` | Avoids rounding errors (R25) | Decided |
-| Backup file | JSON via kotlinx.serialization, written with Android's file picker | Readable, versioned, and needs no storage permission | Assumed |
-| Build | Gradle Kotlin DSL with a version catalog (`libs.versions.toml`) | One place for all library versions | Assumed |
-| Minimum Android version | API 26 (Android 8.0) | Covers nearly every current phone. Target is the latest API | Assumed |
+| Backup file | JSON via kotlinx.serialization, written with Android's file picker | Readable, versioned, and needs no storage permission | Assumed - not built until M9 |
+| Build | Gradle Kotlin DSL with a version catalog (`libs.versions.toml`) | One place for all library versions | Decided |
+| Minimum Android version | API 26 (Android 8.0) | Covers nearly every current phone. Target is the latest API | Decided |
 
-**About Room 3.0:** Google announced Room 3.0 in March 2026 as an alpha with a different package name and Kotlin-only code generation. Room 2.x moves to maintenance mode. We start on Room 2.x, and we write DAO functions in the style Room 3.0 requires (`suspend` functions or `Flow`), so a later move is small. Check whether Room 3.0 is stable when Phase 2 starts.
+**About Room 3.0:** Google announced Room 3.0 in March 2026 as an alpha with a different package name and Kotlin-only code generation. Room 2.x moves to maintenance mode. Decided (row in [07-open-questions.md](07-open-questions.md)): staying on Room 2.x (2.8.5) through all of v1, no revisit planned. DAO functions are already written in the style Room 3.0 requires (`suspend` functions or `Flow`), so a later move would stay small if it's ever wanted.
 
 ## 2. Architecture
 
@@ -70,7 +70,7 @@ Room ──Flow──▶ Repository ──Flow──▶ ViewModel ──StateFlo
 
 1. **SMS arrives.** `SmsReceiver` (Android calls it) asks `SmsParser` for the amount and merchant, then saves a `SmsMessage` row through `MessageRepository`. It shows or updates the "N new spends detected" notification. The receiver does only this.
 2. **Messages page opens.** `MessagesViewModel` collects `MessageRepository.observeMessages()` and turns it into `MessagesUiState`. `MessagesScreen` draws the rows.
-3. **User swipes right.** The screen calls `viewModel.onAccept(id)`. The app opens the Add transaction screen for that message.
+3. **User swipes right.** The screen calls `viewModel.onSwipeStart(id)`. On a Not assigned message this opens the Add transaction screen for it; on an Accepted or Rejected message the swipe instead reverts it to Not assigned (built in M4 - see [04-messages-and-notifications.md](04-messages-and-notifications.md#gestures) for the full per-status rule).
 4. **Add transaction opens.** `AddTransactionViewModel` loads the message and asks `CategorySuggester` for a category. The form is pre-filled.
 5. **User taps Save.** `TransactionRepository.saveFromMessage(...)` inserts the transaction and marks the message **Accepted** in one Room database transaction, so either both happen or neither does. This is what makes "a message turns green only after the transaction is saved" true.
 6. **Home updates by itself.** The Home ViewModel is already collecting a `Flow` from Room, so the new totals appear without any refresh code.
@@ -225,7 +225,7 @@ These come from the mockups. Where a component appears on several screens it is 
 | `StatusBadge` | Messages, Message detail | Icon and label, so colour is never the only signal |
 | `FilterChipRow` | Messages | Chips with counts |
 | `SegmentedTabs` | Trends | Three-way tab control |
-| `SwipeRow` | Messages, Categories | Wraps Compose's swipe-to-dismiss with a start strip and end strip. Messages uses Accept and Reject, Categories uses Archive |
+| `SwipeRow` | Messages, Categories | Wraps Compose's swipe-to-dismiss with a configurable start and end `SwipeAction` (icon, colour, enabled) per row, so the reveal strip always matches what that swipe will really do. Messages varies it by status (Accept/Reject on Not assigned, a neutral "undo" on Accepted/Rejected's one live direction); Categories uses a fixed Archive |
 | `AmountField` | Add transaction, budget sheet | A rupee field that keeps whole numbers and shows Indian grouping |
 | `FormSheet` | New category, edit budget amount | One bottom sheet used for both "edit an amount" and "new category with amount" |
 | `ConfirmDialog` | Backup restore, delete | Title, message, confirm, and cancel |
@@ -272,7 +272,7 @@ Phase 1 is testing this. The real design follows the same rules:
 - **Parsing is isolated.** `BankRules.kt` holds one small block per bank, each with sample messages and tests. Adding a bank should never touch other banks' rules.
 - **Catch-up on open.** `InboxScanner` reads the SMS inbox for anything newer than the last message processed, and the unique `dedupeKey` prevents double entries.
 - **No SMS text in logs.** Log outcomes ("parsed 1 message"), not content.
-- **Hilt in a receiver:** annotate it with `@AndroidEntryPoint` and call `super.onReceive` first. If this proves fiddly, use a Hilt entry point instead.
+- **Hilt in a receiver:** `@AndroidEntryPoint` cannot be used here - confirmed in M2a. It requires calling `super.onReceive()` first, but that method is abstract in the Android SDK's `BroadcastReceiver` and can never actually be called; this is a genuine, longstanding Dagger/Hilt limitation (google/dagger#1918), not a workaround-of-convenience. `SmsReceiver` instead stays a plain `BroadcastReceiver` with a manual `@EntryPoint interface` fetched via `EntryPointAccessors.fromApplication()`.
 - **WorkManager is not used in v1.** The receiver plus the catch-up scan cover the need. Add it later only if Phase 2 testing shows the receiver being cut short.
 
 ## 7. Settings and backup

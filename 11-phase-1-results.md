@@ -37,7 +37,7 @@ For each row: did the message appear in the list, did a notification show, and h
 |---|---|---|---|---|---|
 | 1 | App open | | | | |
 | 2 | App in background | | | | |
-| 3 | App swiped away | | | | |
+| 3 | App swiped away | Yes | First attempt: no (Bedtime/DND was active on the phone, silently suppressed it - see note below). Retest with DND off: yes | Not timed | **First attempt is a real finding, not a bug**: the receiver caught and logged the SMS correctly with the app fully closed - this is R8, the most important risk in the project, confirmed working. The notification specifically was swallowed by the phone's Bedtime automatic DND rule ("while charging after 11pm"), because the app's notification channel doesn't have "Allow to bypass Do Not Disturb" enabled - Android requires the user to grant that per channel, apps can't self-grant it. With DND off, the notification appeared normally. Real-app implication: consider prompting the user to enable DND-bypass for the alert channel during onboarding, since a night-time spend would otherwise go silently unnoticed |
 | 4 | After reboot, app not opened | | | | |
 | 5 | Screen off one hour, Battery Saver on | | | | |
 | 6 | After Force stop (expect nothing) | | | | |
@@ -46,7 +46,7 @@ For each row: did the message appear in the list, did a notification show, and h
 | 8 | Two spends close together ("2 new spends") | | | | |
 | 9 | OTP or other non-spend message (no notification) | | | | |
 | 10 | Second SIM (if used) | | | | |
-| 11 | A real bank SMS | | | | |
+| 11 | A real bank SMS | Yes | Yes | Not timed | Tested against the **real app** (BudgetManager, M2a build), not the BudgetSpike spike - a genuine ICICI Bank debit SMS (₹223.25, UPI) arrived naturally and was caught with no test string involved. Verified directly in the database (not just on screen): correctly classified as spend-like, stored with status=NOT_ASSIGNED, is_new=1, a proper dedupe_key, and the "spend_alerts" notification channel showed an active, unseen notification. The 9 starter categories were also confirmed seeded on first real use. Real message content was pulled briefly to verify, then deleted immediately per the privacy rules in 13-development-best-practices.md |
 
 ## Overall
 

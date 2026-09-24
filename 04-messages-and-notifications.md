@@ -42,13 +42,17 @@ Because several banks are used, the app cannot rely on one fixed SMS format. Par
 
 ### Gestures
 
-| Gesture | Result |
-|---|---|
-| Swipe right | Accept and edit. Opens Add Transaction pre-filled *(direction assumed)* |
-| Swipe left | Reject *(direction assumed)*. A short Undo bar appears |
-| Tap | Open the message and show the full SMS, with Accept and Reject buttons |
+Confirmed and built in M3/M4 (2026-09-25). Only a **Not assigned** message can become Accepted or Rejected; there is no direct Accepted-to-Rejected move or reverse. Accepted and Rejected each only revert to Not assigned. This is stricter than the original plan below (row 7 in [07-open-questions.md](07-open-questions.md)) and replaces it, to keep the state machine symmetric and to stop an accepted message's transaction from ever being orphaned by a status change that bypasses deleting it.
 
-A rejected message can still be accepted later, by swiping right on it or with the Accept button on its detail page. There is no separate "restore" action.
+| Row status | Swipe right (start-to-end) | Swipe left (end-to-start) |
+|---|---|---|
+| Not assigned | Opens Add Transaction, pre-filled. Becomes Accepted once saved | Reject. A short Undo bar appears |
+| Accepted | No effect | Reverts to Not assigned (deletes the linked transaction) |
+| Rejected | Reverts to Not assigned | No effect |
+
+The reveal strip under the row always matches what that swipe will really do: green check / red cross on a Not assigned row, a neutral grey "undo" icon on the one live direction for Accepted or Rejected, and nothing on a no-op direction.
+
+Tap opens the message and shows the full SMS, with Accept and Reject buttons on the detail sheet. Those buttons only act while the message is Not assigned; on an already-decided message they show but do nothing, since the only way back is the revert swipe above.
 
 ### Accepting
 

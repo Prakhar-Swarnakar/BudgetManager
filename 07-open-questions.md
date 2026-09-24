@@ -14,7 +14,7 @@ Earlier this file listed assumptions and open questions. On 24 September 2026 yo
 | 4 | Red circle behaviour | Appears when there are new messages. Clears when the Messages page is opened. Row highlights clear when the user leaves the page |
 | 5 | Message order | Newest first |
 | 6 | Credit SMS | Ignored in v1. No message is created |
-| 7 | Can a rejected message be restored | It can still be accepted later, by swipe or from the detail page. No separate restore action |
+| 7 | Can a rejected message be restored | Revised 2026-09-25, during M4 build: yes, but only back to Not assigned, not straight to Accepted. Swiping (or the detail page, once it's back to Not assigned) is how it moves on from there. Only a Not assigned message can become Accepted or Rejected; Accepted and Rejected each only revert to Not assigned. Full gesture table in [04-messages-and-notifications.md](04-messages-and-notifications.md#gestures) |
 | 8 | Does the detail page have Accept and Reject buttons | Yes |
 | 9 | How long do accepted and rejected messages stay | Forever. The filter chips manage the list. Archiving is in the backlog |
 | 10 | A spend message whose amount cannot be read | It is still saved with its raw text and blank fields, so nothing is lost |
@@ -59,6 +59,7 @@ Earlier this file listed assumptions and open questions. On 24 September 2026 yo
 |---|---|---|
 | Phase 1 test results, remaining rows (swiped away confirmed working; reboot, force-stop, screen-off-an-hour, second SIM still to run) ([11-phase-1-results.md](11-phase-1-results.md)) | Good to have before M2b; did not block M2a/M2c, which are already built and proven against a real SMS | You |
 | 30 to 50 real bank SMS with personal details removed ([14-implementation-plan.md](14-implementation-plan.md) explains how and gives a template) | Milestone M2b, the per-bank parser - the only part of M2 not yet built | You |
+| Future testing: confirm the Add Transaction Cancel button now works in one tap. A "needs 3 taps" bug was reported during M4; no logic bug was found in Cancel's own code, so a hypothesis-driven fix (explicitly dismiss the keyboard/clear focus on both Cancel and Save before acting, commit `d82d4a8`) shipped without a confirmed root cause. If it still misbehaves, especially with no keyboard ever shown, that rules out the keyboard theory and needs on-device input-event logging instead | M4 sign-off | You |
 | ~~Confirm the application ID in row 27~~ Done: `com.budgetmanager.app` | Before milestone M0 | You |
 | ~~Whether Navigation 3 is stable~~ Done: confirmed stable, in use since M0 (row 26) | Milestone M0 | Me |
 | Whether Room 3.0 is stable | Not needed - staying on Room 2.x (2.8.5) through v1 as planned; no reason to revisit | Me |
